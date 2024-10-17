@@ -1,0 +1,8 @@
+{
+  "nama": "thanel",
+  "umur": 19,
+  "nim": "712200888",
+  "lulus": false,
+  "hobby": ["coding", "ngulik server"],
+  "dosenWali": "pak nug"
+}
