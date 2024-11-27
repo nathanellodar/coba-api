@@ -5,12 +5,27 @@ const bodyParser = require('body-parser')
 const dataBase = require("../config/connection")
 const responseFormat = require("./response")
 
-// memanggil routes botol plastik
-const plastikBotol = require("./plastik/botol")
 const login = require("../controller/userController")
-
-app.use("/plastik/botol", plastikBotol)
 app.use("/", login)
+
+const plastik = require("./plastik/plastik")
+app.use("/plastik", plastik)
+
+const kaca = require("./Kaca/kaca");
+app.use("/kaca", kaca);
+
+const besi = require("./Besi/besi");
+app.use("/besi", besi);
+
+const kertas = require("./Kertas/kertas");
+app.use("/kertas", kertas);
+
+const kardus = require("./Kardus/kardus");
+app.use("/kardus", kardus);
+
+const perintilan = require("./Perintilan/perintilan");
+app.use("/perintilan", perintilan);
+
 
 // cara menggunakan bodyParser
 app.use(bodyParser.json()) // artinya akan mengubah kiriman request dari depan ke bentuk json
@@ -44,16 +59,7 @@ app.get('/tutorialPopuler', (req, res) => {
     })
 })
 
-app.get("/botol/plastik", (req, res) => {
-    const query = 'SELECT tutorial.idTutorial as "id", tutorial.judul, tutorial.deskripsi, detailtutorial.alat, detailtutorial.bahan, detailtutorial.langkahKerja, detailtutorial.gambar, detailtutorial.tipeSampah, detailtutorial.jenisSampah, detailtutorial.totalView FROM tutorial, detailtutorial  WHERE tutorial.idTutorial = detailtutorial.idTutorial AND detailtutorial.tipeSampah = "Botol" AND detailtutorial.jenisSampah = "Plastik" ORDER BY detailtutorial.totalView DESC;'
-    dataBase.query(query, (error, result) => {
-        if (error) {
-            responseFormat(500, null, "error get data from database", res)
-        } else {
-            responseFormat(200, result, "success get data from database", res)
-        }
-    })
-})
+
 
 app.get("/tutorial", (req, res) => {
     dataBase.query("select * from tutorial;", (error, result) => {
@@ -70,5 +76,5 @@ app.get("/tutorial", (req, res) => {
 })
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+    console.log(`Example app listening on port  http://localhost:${port}`)
 })

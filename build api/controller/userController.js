@@ -16,9 +16,6 @@ userRouter.post("/register", async (req, res) => {
                 message: "Invalid input. Password must be at least 8 characters.",
             });
         }
-
-
-
         // Simpan ke database
         await User.create({ name, email, password: password });
 
