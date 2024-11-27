@@ -26,6 +26,10 @@ app.use("/kardus", kardus);
 const perintilan = require("./Perintilan/perintilan");
 app.use("/perintilan", perintilan);
 
+const adminController = require("../controller/adminController");
+app.use("/admin", adminController);
+
+
 
 // cara menggunakan bodyParser
 app.use(bodyParser.json()) // artinya akan mengubah kiriman request dari depan ke bentuk json
