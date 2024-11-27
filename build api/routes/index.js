@@ -26,8 +26,8 @@ app.use("/kardus", kardus);
 const perintilan = require("./Perintilan/perintilan");
 app.use("/perintilan", perintilan);
 
-const adminController = require("../controller/adminController");
-app.use("/admin", adminController);
+const admin = require("../controller/adminController");
+app.use("/admin", admin);
 
 
 
