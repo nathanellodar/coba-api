@@ -1,12 +1,14 @@
+require('@google-cloud/debug-agent').start()
+
 const express = require('express')
 const app = express()
-const port = 2121
+// const port = 8000
 const bodyParser = require('body-parser')
 const dataBase = require("../config/connection")
 const responseFormat = require("./response")
 
 const login = require("../controller/userController")
-app.use("/", login)
+app.use("/auth", login)
 
 const plastik = require("./plastik/plastik")
 app.use("/plastik", plastik)
@@ -34,50 +36,32 @@ app.use("/admin", admin);
 app.use(bodyParser.json()) // artinya akan mengubah kiriman request dari depan ke bentuk json
 
 app.get("/", (req, res) => {
+    console.log("Response success")
     dataBase.query("select * from tutorial;", (error, result) => {
         // hasil dari query
-        responseFormat(200, result, "success get all data from tutorial", res)
-    })
-})
-
-app.get('/tutorialPopuler', (req, res) => {
-    res.send({
-        "status": "success",
-        "tutorial": [
-            {
-                "id": "1",
-                "title": "Introduction to Express.js",
-                "author": "John Doe",
-                "date": "2020-01-01",
-                "views": 1000
-            },
-            {
-                "id": "2",
-                "title": "Building RESTful APIs with Node.js",
-                "author": "Jane Doe",
-                "date": "2020-02-01",
-                "views": 500
-            }
-        ]
+        if (error) {
+            console.log(error)
+            responseFormat(500, null, "error get all data from tutorial", res)
+        } else {
+            responseFormat(200, result, "success get all data from tutorial", res)
+        }
     })
 })
 
 
-
-app.get("/tutorial", (req, res) => {
-    dataBase.query("select * from tutorial;", (error, result) => {
-        // hasil dari query
-        const query = 'SELECT tutorial.idTutorial as "id", tutorial.judul, tutorial.deskripsi, detailtutorial.alat, detailtutorial.bahan, detailtutorial.langkahKerja, detailtutorial.gambar, detailtutorial.tipeSampah, detailtutorial.jenisSampah, detailtutorial.totalView FROM tutorial, detailtutorial  WHERE tutorial.idTutorial = detailtutorial.idTutorial ORDER BY detailtutorial.totalView DESC'
-        dataBase.query(query, (error, result) => {
-            if (error) {
-                responseFormat(500, null, "error get data from database", res)
-            } else {
-                responseFormat(200, result, "success get data from database", res)
-            }
-        })
+app.post("/views", (req, res) => {
+    const { id, jenisSampah } = req.body
+    const query = 'UPDATE detailtutorial SET detailtutorial.totalView = detailtutorial.totalView + 1 WHERE detailtutorial.idTutorial = ? and detailtutorial.jenisSampah = ?'
+    dataBase.query(query, [id, jenisSampah], (error, result) => {
+        if (error) {
+            responseFormat(500, null, "error update view", res)
+        } else {
+            responseFormat(201, result, "success update view", res)
+        }
     })
 })
 
-app.listen(port, () => {
-    console.log(`Example app listening on port  http://localhost:${port}`)
+const PORT = process.env.PORT || 8000
+app.listen(PORT, () => {
+    console.log("Server is up and listening on " + PORT)
 })

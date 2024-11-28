@@ -1,10 +1,21 @@
-const mysql = require('mysql')
+const mysql = require('mysql2');
 
+// Membuat koneksi ke database menggunakan mysql2
 const dataBase = mysql.createConnection({
-    host: "localhost",
-    usename: "root",
-    password: "",
-    database: "capstone"
-})
+    host: "",     // Alamat server database
+    user: "",          // Username database
+    password: ".",   // Password database
+    database: "",      // Nama database
+});
 
-module.exports = dataBase
+// Tes koneksi untuk memastikan berhasil
+dataBase.connect((err) => {
+    if (err) {
+        console.error('Koneksi database gagal:', err.message);
+    } else {
+        console.log('Koneksi database berhasil!');
+    }
+});
+
+// Ekspor koneksi untuk digunakan di file lain
+module.exports = dataBase;

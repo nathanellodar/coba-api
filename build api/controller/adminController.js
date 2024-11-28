@@ -1,5 +1,5 @@
 const express = require("express");
-const { User } = require("../config/db");
+const { User } = require("../config/connection");
 const adminRouter = express.Router();
 
 // Middleware for admin authentication using a query parameter
@@ -20,7 +20,7 @@ const adminAuth = (req, res, next) => {
 adminRouter.get("/users", adminAuth, async (req, res) => {
     try {
         const users = await User.findAll({
-            attributes: ["id", "name", "email", "createdAt"], // Only fetch specific fields
+            attributes: ["id_user", "name_user", "email_user", "createdAt"],
         });
 
         res.status(200).json({
