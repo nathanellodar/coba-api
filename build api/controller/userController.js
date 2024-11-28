@@ -2,28 +2,28 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const userRouter = express.Router();
-const { User } = require("../config/db");
+const User = require("../config/db");
 
 userRouter.use(express.json());
 
 userRouter.post("/register", async (req, res) => {
-    console.log(req.body);
     try {
-        const { name, email, password } = req.body;
-        if (!name || !email || !password || password.length < 8) {
+        const { name_user, email_user, password_user } = req.body;
+        if (!name_user || !email_user || !password_user || password_user.length < 8) {
             return res.status(400).json({
                 error: true,
                 message: "Invalid input. Password must be at least 8 characters.",
             });
         }
         // Simpan ke database
-        await User.create({ name, email, password: password });
+        await User.create({ name_user, email_user, password_user: password_user });
 
         res.status(201).json({
             error: false,
             message: "User Created",
         });
     } catch (err) {
+        console.log(err);
         if (err.name === "SequelizeUniqueConstraintError") {
             res.status(400).json({
                 error: true,
@@ -40,10 +40,11 @@ userRouter.post("/register", async (req, res) => {
 
 userRouter.post("/login", async (req, res) => {
     try {
-        const { email, password } = req.body;
+        // console.log(req.body);
+        const { email_user, password_user } = req.body;
 
         // Cari user berdasarkan email
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findOne({ where: { email_user } });
         if (!user) {
             return res.status(404).json({
                 error: true,
@@ -52,29 +53,43 @@ userRouter.post("/login", async (req, res) => {
         }
 
         // Cek password
-        const isPasswordValid = bcrypt.compareSync(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({
-                error: true,
-                message: "Invalid password",
+        bcrypt.hash(password_user, 10, (err, encryptPass) => {
+            if (err) {
+                console.error("Error hashing string a:", err);
+                return;
+            }
+
+            // Cocokkan b dengan hash dari a
+            bcrypt.compare(user.password_user, encryptPass, (err, isMatch) => {
+                if (err) {
+                    console.error("Error comparing strings:", err);
+                    return;
+                }
+
+                if (isMatch) {
+                    // Buat token JWT
+                    const token = jwt.sign(
+                        { userId: user.id, name: user.name },
+                        "your-secret-key",
+                        { expiresIn: "1d" }
+                    );
+
+                    res.status(200).json({
+                        error: false,
+                        message: "success",
+                        loginResult: {
+                            userId: user.id,
+                            name: user.name_user,
+                            token,
+                        },
+                    });
+                } else {
+                    return res.status(401).json({
+                        error: true,
+                        message: "Invalid password",
+                    });
+                }
             });
-        }
-
-        // Buat token JWT
-        const token = jwt.sign(
-            { userId: user.id, name: user.name },
-            "your-secret-key",
-            { expiresIn: "1d" }
-        );
-
-        res.status(200).json({
-            error: false,
-            message: "success",
-            loginResult: {
-                userId: user.id,
-                name: user.name,
-                token,
-            },
         });
     } catch (err) {
         res.status(500).json({

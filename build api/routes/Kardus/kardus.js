@@ -5,7 +5,7 @@ const responseFormat = require("../response")
 const kardus = express.Router();
 
 kardus.get('/', (req, res) => {
-    const query = 'SELECT tutorial.idTutorial as "id", tutorial.judul, tutorial.deskripsi, detailtutorial.alat, detailtutorial.bahan, detailtutorial.langkahKerja, detailtutorial.gambar, detailtutorial.tipeSampah, detailtutorial.jenisSampah, detailtutorial.totalView FROM tutorial, detailtutorial  WHERE tutorial.idTutorial = detailtutorial.idTutorial AND detailtutorial.tipeSampah = "Botol" AND detailtutorial.jenisSampah = "kardus" ORDER BY detailtutorial.totalView DESC;'
+    const query = 'SELECT tutorial.idTutorial as "id", tutorial.judul as "title", tutorial.deskripsi as "desc", detailtutorial.alat as "tools", detailtutorial.langkahKerja as "steps", detailtutorial.gambar as "pitcURL", detailtutorial.tipeSampah as "wasteType", detailtutorial.jenisSampah as "wasteGroup", detailtutorial.totalView FROM tutorial LEFT join detailtutorial ON tutorial.idTutorial = detailtutorial.idTutorial WHERE detailtutorial.jenisSampah = "Kardus" ORDER BY detailtutorial.totalView DESC'
     dataBase.query(query, (error, result) => {
         if (error) {
             responseFormat(500, null, "error get data from database kardus", res)
