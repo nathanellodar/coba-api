@@ -1,7 +1,7 @@
 
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = new Sequelize('capstone', 'capstone', 'capstone12.', {
-  host: '35.229.210.13',
+const sequelize = new Sequelize('', '', '', {
+  host: '',
   dialect: 'mysql', // atau 'postgres', 'sqlite', dll.
 });
 
